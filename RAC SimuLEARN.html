@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RAC SimuLEARN – Interactive Refrigeration Cycle Trainer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--b:#0b5fd7;--r:#d62828;--bg:#fff;--card:#f3f5f9;--tx:#14181f;--mut:#5b6575;--bd:#d9dee7;--board:#e4e8ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f141b;--card:#18202b;--tx:#e8ecf2;--mut:#9aa6b6;--bd:#2a3442;--board:#222c39;--b:#4b8dff;--r:#ff5252}}
+:root[data-theme="dark"]{--bg:#0f141b;--card:#18202b;--tx:#e8ecf2;--mut:#9aa6b6;--bd:#2a3442;--board:#222c39;--b:#4b8dff;--r:#ff5252}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 15px/1.55 Inter,Roboto,Arial,sans-serif}
+header{background:var(--b);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 20px;flex-wrap:wrap}
+.logo{width:48px;height:48px;border:2px dashed #fff9;border-radius:6px;font-size:10px;display:grid;place-items:center;text-align:center;line-height:1.1}
+.brand b{font-size:20px;font-weight:800;display:block;line-height:1.1}.brand span{font-size:12px;opacity:.9}
+nav{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+nav button{background:none;border:0;color:#fff;font:600 14px Inter,sans-serif;padding:8px 12px;border-radius:6px;cursor:pointer}
+nav button:hover{background:#fff2}nav button.on{background:#fff;color:var(--b)}
+main{max-width:1240px;margin:0 auto;padding:22px 20px 40px}
+.view{display:none}.view.on{display:block}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0 0 8px;font-weight:800}
+h2{font-size:24px;margin:0 0 6px;font-weight:700}h3{font-size:17px;margin:0 0 6px;font-weight:600}
+p{margin:0 0 10px;max-width:70ch}.mut{color:var(--mut)}
+.btn{font:600 14px Inter,sans-serif;border:0;border-radius:6px;padding:10px 16px;background:var(--b);color:#fff;cursor:pointer;transition:transform .08s,filter .15s}
+.btn:hover{filter:brightness(1.1)}.btn:active{transform:scale(.97)}
+.btn.red{background:var(--r)}.btn.gray,.btn:disabled{background:#8a93a2;cursor:not-allowed}.btn.sm{padding:6px 10px;font-size:13px}
+.btn.line{background:none;color:var(--b);border:1.5px solid var(--b)}
+.hero{padding:34px 0 26px;border-bottom:1px solid var(--bd);margin-bottom:22px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:14px;text-align:left;color:var(--tx);font:inherit}
+button.card{cursor:pointer}button.card:hover{border-color:var(--b)}
+.tl{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:18px}
+@media(max-width:900px){.tl{grid-template-columns:1fr}}
+.stage{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px}
+svg{width:100%;height:auto;display:block}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs .btn{background:var(--card);color:var(--tx);border:1px solid var(--bd)}.tabs .btn.on{background:var(--b);color:#fff;border-color:var(--b)}
+.pane{display:none}.pane.on{display:block}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+dl{margin:0}dt{font-weight:600;font-size:12px;color:var(--mut);margin-top:8px}dd{margin:0}
+.leg{display:flex;gap:16px;font-size:13px;margin:8px 2px;flex-wrap:wrap}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.meters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meter{background:#10151c;color:#f2f4f8;border-radius:6px;padding:8px 10px}.meter small{color:#9db0c9;font-size:11px;display:block}.meter b{font:600 22px/1.2 Inter,sans-serif}
+.lamp{display:inline-block;width:14px;height:14px;border-radius:50%;background:#556;vertical-align:-2px;margin-right:6px}.lamp.on{background:#2ecc71}
+.stopped{display:none;background:var(--r);color:#fff;font-weight:700;padding:8px 12px;border-radius:6px;margin-top:8px}.stopped.on{display:block}
+.sim-tag{font-size:11px;font-weight:600;color:var(--r);border:1px solid var(--r);border-radius:4px;padding:1px 6px}
+/* svg */
+.board{fill:var(--board)}.pipe{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.hi{stroke:var(--r)}.lo{stroke:var(--b)}
+.flow .pipe,.sim .pipe{stroke-dasharray:10 8;animation:fl .8s linear infinite}
+@keyframes fl{to{stroke-dashoffset:-18}}
+.c{cursor:pointer}.c:hover>*:not(text),.c.hl>*:not(text){stroke:var(--b);stroke-width:4}
+.pipe.hl{stroke-width:11}.dim .pipe:not(.hl){opacity:.25}.dim .c:not(.hl){opacity:.4}
+svg text{font:600 11px Inter,sans-serif;fill:var(--tx);pointer-events:none}
+.bl{transform-box:fill-box;transform-origin:center}.sim .bl{animation:sp .5s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.sim [data-c=compressor]{animation:vib .12s infinite alternate}@keyframes vib{to{transform:translateX(1.5px)}}
+.sim .evb{fill:#cfe2ff}
+#tip{position:fixed;background:#14181f;color:#fff;font-size:12px;padding:3px 8px;border-radius:4px;pointer-events:none;display:none;z-index:9}
+.jack{cursor:pointer}.jack circle{fill:#111;stroke:#fff;stroke-width:2}.jack:hover circle,.jack.sel circle{stroke:#ffd34d;stroke-width:4}
+.wire{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round}
+.opt{display:block;width:100%;margin:6px 0;text-align:left;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:10px;font:inherit;color:var(--tx);cursor:pointer}.opt:hover{border-color:var(--b)}
+.ok{color:#1a8f3c;font-weight:700}.bad{color:var(--r);font-weight:700}
+.note{border-left:4px solid var(--r);background:var(--card);padding:8px 12px;font-size:13px;border-radius:4px;margin:10px 0}
+details{background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:10px 14px;margin:8px 0}summary{cursor:pointer;font-weight:600}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+:focus-visible{outline:3px solid #ffb703;outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">PUP LOGO</div>
+ <div class="brand"><b>RAC SimuLEARN</b><span>Interactive Refrigeration Cycle Trainer</span></div>
+ <nav id="nav"></nav>
+</header>
+<main>
+<section class="view on" id="v-home">
+ <div class="hero">
+  <h1>RAC SimuLEARN</h1><h2 class="mut" style="font-weight:500">Interactive Refrigeration Cycle Trainer</h2>
+  <p>An interactive learning platform that helps students visualize refrigeration-cycle operation, components, pressure conditions, and electrical controls, alongside the physical trainer.</p>
+  <button class="btn" onclick="show('trainer')">EXPLORE THE TRAINER</button>
+ </div>
+ <div class="grid" id="feat"></div>
+ <div class="note">Early version: the refrigerant path follows the standard vapor-compression cycle and is awaiting confirmation against the physical trainer. Items marked “to be verified” are not yet confirmed.</div>
+</section>
+
+<section class="view" id="v-trainer">
+ <h2>Trainer</h2>
+ <div class="tl">
+  <div>
+   <div class="stage">
+   <svg id="tsvg" viewBox="0 0 900 500" role="img" aria-label="Digital refrigeration cycle trainer">
+    <defs><pattern id="fins" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#2f6f8f"/><rect width="2" height="7" fill="#9cc7dc"/></pattern></defs>
+    <rect class="board" x="255" y="15" width="630" height="395" rx="6"/>
+    <path data-p="dis" class="pipe hi" d="M720 402H850V120H820"/>
+    <path data-p="liq1" class="pipe hi" d="M600 150H520V160"/>
+    <path data-p="liq2" class="pipe hi" d="M520 184V208H435V150"/>
+    <path data-p="cap" class="pipe hi" d="M435 90V60H398"/>
+    <path data-p="in" class="pipe lo" d="M352 60H135V220"/>
+    <path data-p="suc" class="pipe lo" d="M250 340H300V440H643"/>
+    <g class="c" data-c="evaporator"><rect class="evb" x="20" y="220" width="230" height="160" rx="6" fill="#fff" stroke="#888" stroke-width="2"/><text x="135" y="305" text-anchor="middle">EVAPORATOR (FREEZER)</text></g>
+    <g class="c" data-c="condenser"><rect x="600" y="40" width="220" height="150" fill="url(#fins)" stroke="#555" stroke-width="2"/><text x="710" y="30" text-anchor="middle">CONDENSER</text></g>
+    <g class="c" data-c="drier"><rect x="420" y="90" width="30" height="60" rx="12" fill="#1d4f8a" stroke="#123" stroke-width="2"/><text x="400" y="125" text-anchor="end">FILTER DRIER</text></g>
+    <g class="c" data-c="sightglass"><circle cx="520" cy="172" r="13" fill="#fff" stroke="#555" stroke-width="2"/><text x="540" y="176">SIGHT GLASS</text></g>
+    <g class="c" data-c="capillary"><path d="M398 60l-8-11-8 22-8-22-8 22-6-11" fill="none" stroke="#b87333" stroke-width="5"/><text x="375" y="40" text-anchor="middle">CAPILLARY</text></g>
+    <g class="c" data-c="lpgauge"><circle cx="325" cy="270" r="26" fill="#fff" stroke="#0b5fd7" stroke-width="6"/><text x="325" y="316" text-anchor="middle">LOW</text></g>
+    <g class="c" data-c="hpgauge"><circle cx="395" cy="270" r="26" fill="#fff" stroke="#d62828" stroke-width="6"/><text x="395" y="316" text-anchor="middle">HIGH</text></g>
+    <g class="c" data-c="switches"><rect x="520" y="255" width="52" height="42" rx="3" fill="#fff" stroke="#555" stroke-width="2"/><rect x="590" y="255" width="52" height="42" rx="3" fill="#fff" stroke="#555" stroke-width="2"/><text x="581" y="318" text-anchor="middle">PRESSURE SWITCHES</text></g>
+    <g class="c" data-c="valves"><circle cx="480" cy="330" r="11" fill="#d62828" stroke="#611" stroke-width="2"/><circle cx="480" cy="360" r="11" fill="#d62828" stroke="#611" stroke-width="2"/><circle cx="480" cy="390" r="11" fill="#d62828" stroke="#611" stroke-width="2"/><text x="498" y="364">HAND VALVES</text></g>
+    <g class="c" data-c="compressor"><ellipse cx="705" cy="440" rx="62" ry="40" fill="#222" stroke="#000" stroke-width="2"/><text x="705" y="445" text-anchor="middle" style="fill:#fff">COMPRESSOR</text></g>
+    <g class="c" data-c="fan"><circle cx="815" cy="445" r="26" fill="#fff" stroke="#555" stroke-width="2"/><g class="bl"><ellipse cx="815" cy="445" rx="22" ry="6" fill="#888"/><ellipse cx="815" cy="445" rx="6" ry="22" fill="#888"/></g><text x="815" y="488" text-anchor="middle">FAN</text></g>
+   </svg>
+   </div>
+   <div class="leg"><span><i class="dot" style="background:var(--r)"></i>High Pressure</span><span><i class="dot" style="background:var(--b)"></i>Low Pressure</span><span class="mut">Layout is simplified from the trainer photo; click any part for details.</span></div>
+  </div>
+  <div>
+   <div class="tabs"><button class="btn on" data-pane="info">Info</button><button class="btn" data-pane="cycle">Refrigeration Cycle</button><button class="btn" data-pane="sim">Simulation</button></div>
+   <div class="pane on" id="p-info"><div id="info" class="card"><p class="mut">Hover over a component to see its name. Click it to open its information.</p></div></div>
+   <div class="pane" id="p-cycle"><div class="card"><div id="cyc"><p>Refrigerant flows in the direction of the moving dashes. Red lines are high pressure and blue lines are low pressure.</p></div>
+    <div class="row"><button class="btn" id="cstart" onclick="cyc(0)">START CYCLE</button><button class="btn gray" id="cprev" onclick="cyc(st-1)" disabled>PREVIOUS</button><button class="btn gray" id="cnext" onclick="cyc(st+1)" disabled>NEXT →</button></div></div></div>
+   <div class="pane" id="p-sim"><div class="card">
+    <span class="sim-tag">SIMULATED DATA</span>
+    <div class="row"><button class="btn" onclick="simStart()">START</button><button class="btn gray" style="background:#4a5568" onclick="simStop()">STOP</button><button class="btn red" onclick="simEstop()">EMERGENCY STOP</button></div>
+    <div class="stopped" id="stopped">SYSTEM STOPPED</div>
+    <p style="margin-top:10px"><i class="lamp" id="lamp"></i>Pilot lamp</p>
+    <div class="meters">
+     <div class="meter"><small>LOW PRESSURE (psi)</small><b id="m-lp">0</b></div><div class="meter"><small>HIGH PRESSURE (psi)</small><b id="m-hp">0</b></div>
+     <div class="meter"><small>VOLTAGE (V)</small><b id="m-v">0</b></div><div class="meter"><small>CURRENT (A)</small><b id="m-a">0.0</b></div>
+     <div class="meter"><small>EVAPORATOR TEMP (°C)</small><b id="m-t">28</b></div></div>
+    <p class="mut" style="margin-top:8px;font-size:13px">Values are illustrative only. They are not measured from the trainer.</p></div></div>
+  </div>
+ </div>
+</section>
+
+<section class="view" id="v-cycle"><h2>Refrigeration Cycle</h2><p>Use the guided mode on the Trainer page to follow the refrigerant one component at a time.</p><button class="btn" onclick="show('trainer');pane('cycle')">START CYCLE ON TRAINER</button></section>
+
+<section class="view" id="v-electrical">
+ <h2>Electrical Control Panel</h2>
+ <p>Practice making connections: click one terminal, then another, to place a wire.</p>
+ <div class="note">Terminal labels are taken from the trainer photo. The jack count and positions are simplified, and the correct wiring sequence has not been verified, so connections are not checked yet.</div>
+ <div class="tl"><div class="stage"><svg id="esvg" viewBox="0 0 700 320"><rect width="700" height="320" rx="10" fill="#1f56a8" stroke="#ddd" stroke-width="6"/><text x="350" y="26" text-anchor="middle" style="fill:#fff;font-size:13px">ELECTRICAL CONTROL PANEL</text>
+  <circle cx="470" cy="190" r="34" fill="#fff"/><text x="470" y="194" text-anchor="middle">V</text><circle cx="560" cy="190" r="34" fill="#fff"/><text x="560" y="194" text-anchor="middle">A</text>
+  <circle cx="640" cy="90" r="12" fill="#2ecc71" stroke="#fff" stroke-width="2"/><circle cx="600" cy="270" r="26" fill="#d62828" stroke="#fff" stroke-width="3"/><text x="600" y="312" text-anchor="middle" style="fill:#fff">EMERGENCY</text>
+  <g id="wires"></g><g id="jacks"></g></svg></div>
+  <div class="card"><h3>Terminal</h3><p id="jinfo" class="mut">Hover over or tap a terminal.</p><h3>Connections</h3><div id="wlist" class="mut">None yet.</div><div class="row"><button class="btn red" onclick="wires=[];selJ=null;drawE()">RESET WIRING</button></div></div></div>
+</section>
+
+<section class="view" id="v-components"><h2>Explore Components</h2><div class="grid" id="clist"></div><div class="card" id="cdetail" style="margin-top:14px;display:none"></div></section>
+<section class="view" id="v-learn"><h2>Learn</h2><div id="mods"></div></section>
+<section class="view" id="v-practice"><h2>Practice</h2><div id="quiz" class="card" style="max-width:720px"><p>Identify components, functions, flow order, and pressure sides.</p><button class="btn" onclick="nextQ(true)">START PRACTICE</button></div></section>
+<section class="view" id="v-about"><h2>About RAC SimuLEARN</h2><p>RAC SimuLEARN is an interactive educational visualization that supports learning with a physical Refrigeration Cycle Trainer.</p>
+ <dl class="card" style="max-width:560px"><dt>Project / Thesis title</dt><dd>[to be provided]</dd><dt>Researchers</dt><dd>[to be provided]</dd><dt>Institution</dt><dd>[to be provided]</dd><dt>Program</dt><dd>[to be provided]</dd><dt>Adviser</dt><dd>[to be provided]</dd></dl></section>
+</main>
+<div id="tip"></div>
+<script>
+const $=id=>document.getElementById(id);
+const NAV=[["home","Home"],["trainer","Trainer"],["cycle","Cycle"],["electrical","Electrical"],["components","Components"],["learn","Learn"],["practice","Practice"],["about","About"]];
+const C={
+compressor:{n:"Compressor",w:"Pumps the refrigerant and raises its pressure.",r:"Draws low-pressure vapor from the evaporator and discharges hot, high-pressure vapor toward the condenser.",f:"Vapor in, superheated vapor out",p:"Low pressure at suction, high pressure at discharge",t:"Refrigerant leaves hot",l:"Black hermetic unit on the table, right of the board",s:"Divides the low and high sides",x:"The panel has LPS and HPS jacks. Their exact wiring is to be verified."},
+condenser:{n:"Condenser",w:"Rejects heat from the refrigerant to the surrounding air.",r:"Cools the hot vapor until it condenses into liquid.",f:"Hot vapor in, liquid out",p:"High",t:"Hot to warm",l:"Blue-finned coil with guard, top right of the board",s:"High",x:"Fin tubes give the refrigerant a large surface for heat transfer."},
+sightglass:{n:"Sight Glass",w:"A small window that lets you see the refrigerant in the line.",r:"Shows whether liquid refrigerant is flowing; bubbles can suggest a problem.",f:"Liquid",p:"High",t:"Warm",l:"Round fitting on the line near the filter drier (position to be verified)",s:"High",x:"Order relative to the drier is to be verified."},
+drier:{n:"Filter Drier",w:"Removes moisture and dirt from the refrigerant.",r:"Protects the capillary tube from blockage and keeps moisture out of the system.",f:"Liquid",p:"High",t:"Warm",l:"Blue cylinder at the upper center of the board",s:"High",x:"Moisture can freeze at the metering device and block flow."},
+capillary:{n:"Capillary Tube",w:"A long, thin tube that meters refrigerant flow.",r:"Creates a large pressure drop so the liquid can boil at low temperature in the evaporator.",f:"High-pressure liquid in, cold low-pressure liquid and vapor mix out",p:"Drops from high to low",t:"Drops sharply",l:"Small coil above the filter drier (to be verified)",s:"Transition (high to low)",x:"This is the dividing point between the high and low sides."},
+evaporator:{n:"Evaporator (Freezer)",w:"Absorbs heat from the freezer space.",r:"Liquid refrigerant boils into vapor, cooling the box.",f:"Liquid and vapor in, vapor out",p:"Low",t:"Cold",l:"White box labeled EVAPORATOR, left of the board",s:"Low",x:"The vapor then returns to the compressor through the suction line."},
+lpgauge:{n:"Low-Pressure Gauge (blue)",w:"Shows pressure on the low side.",r:"Lets students read suction-side pressure.",f:"Vapor",p:"Low",t:"Cold",l:"Blue gauge, center of the board",s:"Low",x:"Which line it taps into is to be verified."},
+hpgauge:{n:"High-Pressure Gauge (red)",w:"Shows pressure on the high side.",r:"Lets students read discharge-side pressure.",f:"Vapor",p:"High",t:"Hot",l:"Red gauge, center of the board",s:"High",x:"Which line it taps into is to be verified."},
+switches:{n:"Pressure Switches (LPS / HPS)",w:"Open or close an electrical circuit at set pressures.",r:"Switch off the compressor circuit if low-side pressure is too low or high-side pressure is too high.",f:"Not in the refrigerant path",p:"One senses low and one senses high",t:"—",l:"Two white Danfoss units, right of the gauges",s:"Low and high",x:"The panel has LPS and HPS jacks. Which unit is which is to be verified."},
+valves:{n:"Hand Valves",w:"Manual valves for service and isolation.",r:"Open or close sections of piping.",f:"Depends on the line",p:"To be verified",t:"—",l:"Three red valves in the lower center of the board",s:"To be verified",x:"You mentioned a blue low-pressure valve and a red high-pressure valve; the photo shows red valves, so this needs confirming."},
+fan:{n:"Fan Motor",w:"Moves air across a coil.",r:"Improves heat transfer.",f:"Not in the refrigerant path",p:"—",t:"—",l:"Small fan near the compressor (to be verified)",s:"—",x:"The panel has a FAN MOTOR label."}};
+const STEPS=[
+{c:"compressor",p:["suc","dis"],t:"STEP 1 — COMPRESSION",d:"Low-pressure vapor enters the compressor. It is compressed, so its pressure and temperature rise, and leaves as hot high-pressure vapor."},
+{c:"condenser",p:["dis"],t:"STEP 2 — CONDENSATION",d:"Hot vapor flows through the condenser coil. It gives up heat to the air and condenses into liquid."},
+{c:"sightglass",p:["liq1"],t:"STEP 3 — SIGHT GLASS",d:"High-pressure liquid passes the sight glass, where flow can be checked by eye."},
+{c:"drier",p:["liq2"],t:"STEP 4 — FILTERING AND DRYING",d:"The filter drier traps moisture and dirt before the liquid reaches the metering device."},
+{c:"capillary",p:["cap"],t:"STEP 5 — EXPANSION",d:"The capillary tube restricts flow. Pressure and temperature drop sharply, turning the liquid into a cold mixture."},
+{c:"evaporator",p:["in","suc"],t:"STEP 6 — EVAPORATION",d:"Cold refrigerant absorbs heat in the evaporator and boils into low-pressure vapor. It returns to the compressor along the suction line."}];
+const ORDER=STEPS.map(s=>s.c);
+const T=$("tsvg");
+/* nav + views */
+$("nav").innerHTML=NAV.map(([k,l])=>`<button data-v="${k}" onclick="show('${k}')">${l}</button>`).join("");
+function show(v){document.querySelectorAll(".view").forEach(e=>e.classList.toggle("on",e.id=="v-"+v));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v==v));window.scrollTo(0,0)}
+show("home");
+$("feat").innerHTML=[["trainer","Interactive Trainer","Click parts of the trainer to learn what each does."],["cycle","Refrigeration Cycle","Follow the refrigerant step by step."],["electrical","Electrical Controls","Practice wiring on a virtual panel."],["components","Component Explorer","Browse every component."],["learn","Learning Modules","Short lessons linked to the trainer."],["practice","Practice / Assessment","Test what you know."]].map(([v,t,d])=>`<button class="card" onclick="show('${v}')"><h3>${t}</h3><span class="mut">${d}</span></button>`).join("");
+document.querySelectorAll(".tabs .btn").forEach(b=>b.onclick=()=>pane(b.dataset.pane));
+function pane(p){document.querySelectorAll(".tabs .btn").forEach(b=>b.classList.toggle("on",b.dataset.pane==p));document.querySelectorAll(".pane").forEach(e=>e.classList.toggle("on",e.id=="p-"+p));T.classList.toggle("flow",p=="cycle");if(p!="cycle")clearHl()}
+/* highlight + info */
+function clearHl(){T.classList.remove("dim");T.querySelectorAll(".hl").forEach(e=>e.classList.remove("hl"))}
+function hl(cs,ps){clearHl();T.classList.add("dim");cs.forEach(c=>T.querySelector(`[data-c=${c}]`).classList.add("hl"));ps.forEach(p=>T.querySelector(`[data-p=${p}]`).classList.add("hl"))}
+function info(id){const c=C[id];$("info").innerHTML=`<h3>${c.n}</h3><dl><dt>Function</dt><dd>${c.w}</dd><dt>Role in the cycle</dt><dd>${c.r}</dd><dt>Refrigerant condition</dt><dd>${c.f}</dd><dt>Pressure</dt><dd>${c.p}</dd><dt>Temperature</dt><dd>${c.t}</dd><dt>Notes</dt><dd>${c.x}</dd></dl>`}
+function focusC(id){show("trainer");pane("info");hl([id],[]);T.classList.remove("dim");info(id)}
+T.addEventListener("click",e=>{const g=e.target.closest(".c");if(!g)return;pane("info");T.classList.remove("flow");clearHl();g.classList.add("hl");info(g.dataset.c)});
+const tip=$("tip");T.addEventListener("mousemove",e=>{const g=e.target.closest(".c");if(!g){tip.style.display="none";return}tip.textContent=C[g.dataset.c].n;tip.style.cssText=`display:block;left:${e.clientX+12}px;top:${e.clientY+12}px`});T.addEventListener("mouseleave",()=>tip.style.display="none");
+/* cycle */
+let st=-1;
+function cyc(i){st=i;T.classList.add("flow");const s=STEPS[i],box=$("cyc");
+ if(i<0){clearHl();box.innerHTML="<p>Refrigerant flows in the direction of the moving dashes.</p>";$("cstart").disabled=false}
+ else if(i>=STEPS.length){clearHl();box.innerHTML="<h3>REFRIGERATION CYCLE COMPLETE</h3><p>The refrigerant is back at the compressor and the cycle repeats.</p>";$("cstart").textContent="RESTART CYCLE"}
+ else{hl([s.c],s.p);info(s.c);box.innerHTML=`<h3>${s.t}</h3><p>${s.d}</p>`;$("cstart").textContent="RESTART CYCLE"}
+ $("cprev").disabled=i<=0;$("cnext").disabled=i<0||i>=STEPS.length;["cprev","cnext"].forEach(id=>$(id).classList.toggle("gray",$(id).disabled))}
+/* simulation */
+const S={run:false,lp:0,hp:0,v:0,a:0,t:28};let timer=null;
+function tick(){const on=S.run,k=.12;const g=(c,t)=>c+(t-c)*k;
+ S.lp=g(S.lp,on?15:0);S.hp=g(S.hp,on?150:0);S.v=g(S.v,on?230:0);S.a=g(S.a,on?1.4:0);S.t=g(S.t,on?-4:28);
+ $("m-lp").textContent=Math.round(S.lp);$("m-hp").textContent=Math.round(S.hp);$("m-v").textContent=Math.round(S.v);$("m-a").textContent=S.a.toFixed(1);$("m-t").textContent=Math.round(S.t);
+ $("lamp").classList.toggle("on",on)}
+function simStart(){$("stopped").classList.remove("on");S.run=true;T.classList.add("sim");clearInterval(timer);timer=setInterval(tick,200)}
+function simStop(){S.run=false;T.classList.remove("sim")}
+function simEstop(){S.run=false;T.classList.remove("sim");S.lp=S.hp=S.v=S.a=0;S.t=28;tick();$("stopped").classList.add("on")}
+/* components */
+$("clist").innerHTML=Object.keys(C).map(k=>`<button class="card" onclick="detail('${k}')"><h3>${C[k].n}</h3><span class="mut">${C[k].s}</span></button>`).join("");
+function detail(k){const c=C[k],d=$("cdetail");d.style.display="block";d.innerHTML=`<h3>${c.n}</h3><dl><dt>What is it?</dt><dd>${c.w}</dd><dt>What does it do?</dt><dd>${c.r}</dd><dt>Where is it located?</dt><dd>${c.l}</dd><dt>What happens to the refrigerant?</dt><dd>${c.f}</dd><dt>Pressure side</dt><dd>${c.s}</dd></dl><div class="row"><button class="btn" onclick="focusC('${k}')">SHOW ON TRAINER</button></div>`;d.scrollIntoView({behavior:"smooth"})}
+/* learn */
+const MODS=[["Introduction to Refrigeration","Refrigeration moves heat from a space you want cold to a place where it can be released.",null],["Refrigeration Cycle","Refrigerant is compressed, condensed, expanded, and evaporated in a closed loop.","compressor"],["Compressor","It raises refrigerant pressure and circulates it through the system.","compressor"],["High-Pressure Side","From compressor discharge to the metering device. Components here are hot and under higher pressure.","condenser"],["Filter Drier and Sight Glass","The drier removes moisture and dirt; the sight glass shows liquid flow.","drier"],["Metering Device / Capillary Tube","It restricts flow and drops the pressure.","capillary"],["Evaporator","Refrigerant boils here and absorbs heat from the freezer.","evaporator"],["Low-Pressure Side","From the metering device through the evaporator and suction line to the compressor.","lpgauge"],["Refrigeration Controls","Pressure switches and hand valves help control and protect the system.","switches"],["Electrical Control Circuit","The panel jacks (L1, L2, LPS, HPS, compressor, fan motor, pilot lamp) connect the trainer’s electrical parts. Exact wiring is to be verified.",null],["Pressure Controls","The low- and high-pressure switches react to abnormal pressures.","switches"],["System Operation","In operation the compressor and fan run, refrigerant circulates, and the evaporator cools.",null]];
+$("mods").innerHTML=MODS.map((m,i)=>`<details><summary>${String(i+1).padStart(2,"0")} — ${m[0]}</summary><p>${m[1]}</p>${m[2]?`<button class="btn sm" onclick="focusC('${m[2]}')">VIEW ${C[m[2]].n.toUpperCase()} ON TRAINER</button>`:""}${i==11?`<button class="btn sm" onclick="show('trainer');pane('sim')">OPEN SIMULATION</button>`:""}</details>`).join("");
+/* practice */
+let q=null,score=0,asked=0;
+const PS={dis:"High",liq1:"High",liq2:"High",cap:"High",in:"Low",suc:"Low"};
+const pick=a=>a[Math.floor(Math.random()*a.length)],shuf=a=>a.slice().sort(()=>Math.random()-.5);
+function mkQ(){const t=Math.floor(Math.random()*4),names=k=>shuf([k,...shuf(ORDER.filter(x=>x!=k)).slice(0,3)]);
+ if(t==0){const k=pick(ORDER);return{h:{c:[k]},q:"What component is highlighted?",o:names(k).map(x=>[x,C[x].n]),a:k,e:`${C[k].n}: ${C[k].w}`}}
+ if(t==1){const k=pick(ORDER);return{q:`What is the function of the ${C[k].n}?`,o:names(k).map(x=>[x,C[x].w]),a:k,e:`${C[k].n}: ${C[k].w}`}}
+ if(t==2){const i=Math.floor(Math.random()*5),k=ORDER[i],n=ORDER[i+1];return{q:`Which component comes next after the ${C[k].n}?`,o:names(n).map(x=>[x,C[x].n]),a:n,e:`The cycle goes ${ORDER.map(x=>C[x].n).join(" → ")}.`}}
+ const useP=Math.random()<.5,id=useP?pick(Object.keys(PS)):pick(["condenser","drier","evaporator","hpgauge","lpgauge"]),side=useP?PS[id]:C[id].s;
+ return{h:useP?{p:[id]}:{c:[id]},q:"Which side of the refrigeration system is this?",o:[["High","HIGH-PRESSURE SIDE"],["Low","LOW-PRESSURE SIDE"]],a:side,e:side=="High"?"It lies between compressor discharge and the capillary tube, so it is high pressure.":"It lies between the capillary tube and the compressor suction, so it is low pressure."}}
+function nextQ(first){if(first){score=0;asked=0}q=mkQ();asked++;let sv="";
+ if(q.h){const el=T.cloneNode(true);el.removeAttribute("id");el.classList.remove("flow","sim","dim");el.querySelectorAll(".hl").forEach(e=>e.classList.remove("hl"));(q.h.c||[]).forEach(c=>el.querySelector(`[data-c=${c}]`).classList.add("hl"));(q.h.p||[]).forEach(p=>el.querySelector(`[data-p=${p}]`).classList.add("hl"));sv=el.outerHTML}
+ $("quiz").innerHTML=`<p class="mut">Question ${asked} · Score ${score}</p>${sv}<h3>${q.q}</h3>${q.o.map(o=>`<button class="opt" data-k="${o[0]}">${o[1]}</button>`).join("")}<div id="fb"></div>`;
+ $("quiz").querySelectorAll(".opt").forEach(b=>b.onclick=()=>ans(b))}
+function ans(b){const ok=b.dataset.k==q.a;if(ok)score++;$("quiz").querySelectorAll(".opt").forEach(x=>x.disabled=true);
+ $("fb").innerHTML=`<p class="${ok?"ok":"bad"}">${ok?"Correct!":"Try Again"}</p><p>${q.e}</p><button class="btn" onclick="nextQ()">NEXT QUESTION</button>`}
+/* electrical */
+const J=[["L1","L1",80,80,"Line 1 of the power supply (label read from panel)."],["L2","L2",80,160,"Line 2 of the power supply (label read from panel)."],["LPS","LPS",200,80,"Low-pressure switch connection."],["HPS","HPS",200,160,"High-pressure switch connection."],["COMP","COMPRESSOR",320,80,"Compressor connection."],["LAMP","PILOT LAMP",320,160,"Pilot lamp connection."],["FAN","FAN MOTOR",440,80,"Fan motor connection."]];
+let wires=[],selJ=null;
+function drawE(){$("jacks").innerHTML=J.map(j=>`<g class="jack${selJ==j[0]?" sel":""}" data-j="${j[0]}" tabindex="0"><circle cx="${j[2]}" cy="${j[3]}" r="13"/><text x="${j[2]}" y="${j[3]+34}" text-anchor="middle" style="fill:#fff">${j[1]}</text></g>`).join("");
+ const P=id=>J.find(j=>j[0]==id);
+ $("wires").innerHTML=wires.map(([a,b])=>{const A=P(a),B=P(b);return`<path class="wire" d="M${A[2]} ${A[3]}Q${(A[2]+B[2])/2} ${Math.max(A[3],B[3])+70} ${B[2]} ${B[3]}"/>`}).join("");
+ $("wlist").innerHTML=wires.length?wires.map(([a,b],i)=>`<div class="row" style="align-items:center;margin:4px 0">${P(a)[1]} ⟷ ${P(b)[1]}<button class="btn sm red" onclick="wires.splice(${i},1);drawE()">REMOVE CONNECTION</button></div>`).join(""):"None yet."}
+$("esvg").addEventListener("click",e=>{const g=e.target.closest(".jack");if(!g)return;const id=g.dataset.j;
+ if(!selJ)selJ=id;else if(selJ==id)selJ=null;else{if(!wires.some(w=>(w[0]==selJ&&w[1]==id)||(w[1]==selJ&&w[0]==id)))wires.push([selJ,id]);selJ=null}drawE();const j=J.find(x=>x[0]==id);$("jinfo").textContent=j[1]+": "+j[4]});
+$("esvg").addEventListener("mouseover",e=>{const g=e.target.closest(".jack");if(g){const j=J.find(x=>x[0]==g.dataset.j);$("jinfo").textContent=j[1]+": "+j[4]}});
+drawE();
+</script>
+</body>
+</html>
